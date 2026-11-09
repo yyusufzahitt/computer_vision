@@ -34,8 +34,8 @@
 | 09.11.2026 | Defter iskeleti: kurulum, parametreler, veri tablosu, SIFT + ECC homografi hizalaması | `YZM411_Odev1.ipynb` Bölüm 0–2 | Defter baştan çalıştırıldı; hizalama dama tahtası görüntüsüyle gözle kontrol edildi |
 | 09.11.2026 | Dört deneyin **tahmin taslakları** | Defterdeki 4 "Tahmin" hücresi | Taslakları okudum ve değiştirmeden onayladım; deney kodu yazılmadan **önce** deftere konuldu. 15 tahmin ve beklentiden 5'inin tutmaması, sonuca göre uydurulmadığını gösteriyor |
 | 09–10.11.2026 | Deney 1–4 kodu, ek analiz (geniş eşik), kontrol deneyleri (renk düzeltmesi, örnekleme fazı), ölçüme dayalı yorum taslakları | Defter Bölüm 3–6, `outputs/03_*` – `06_*` | Defter `nbconvert` ile baştan sona birçok kez çalıştırıldı ve aynı sonuçları verdi; formüller ödevdeki örnekle doğrulandı (64 → 127,75 / 16,06); nokta konumları kırpıntılarla gözle kontrol edildi |
-| 10.11.2026 | Sonuç ve karşılaştırma tabloları, rapor şekilleri | Defter Bölüm 7, `outputs/07_*`, `outputs/08_*` | Tablo değerleri defterdeki değişkenlerden otomatik okunuyor; önceki hücre çıktılarıyla karşılaştırıldı |
-| 10.11.2026 | 2 sayfalık rapor taslağı, README ve bu beyan | `rapor/`, `README.md`, `KAYNAK_BEYANI.md` | Rapordaki her sayı `outputs/*.csv` ile karşılaştırıldı; sayfa sayısı programla kontrol edildi |
+| 10.11.2026 | Sonuç ve karşılaştırma tabloları, rapor şekilleri | Defter Bölüm 7, `outputs/07_*` (rapor şekilleri defter çalıştırılınca `outputs/08_*` olarak üretilir) | Tablo değerleri defterdeki değişkenlerden otomatik okunuyor; önceki hücre çıktılarıyla karşılaştırıldı |
+| 10.11.2026 | 2 sayfalık rapor taslağı, README ve bu beyan | `rapor/YZM411_Odev1_Rapor.pdf`, `README.md`, `KAYNAK_BEYANI.md` | Rapordaki her sayı `outputs/*.csv` ile karşılaştırıldı; sayfa sayısı programla kontrol edildi |
 
 **Kendi yaptıklarım:**
 - Sahneyi kurup üç fotoğrafı çektim.

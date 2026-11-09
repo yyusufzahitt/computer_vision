@@ -27,15 +27,15 @@ Ya da Jupyter'de defteri açıp **Kernel → Restart & Run All** seçilir. Hücr
 - **Giriş dosyaları:** `data/normal.jpg`, `data/golge.jpg`, `data/lamba.jpg`. Kendi çekimim; defter bu dosyaları değiştirmez.
 - **Parametreler:** Hepsi defterin 0.1 numaralı hücresinde (eşik bölgesi ve payları, b = +40, γ = 0,5 / 2,0, küçültme 1/4 vb.).
 - **Paket sürümleri:** Defterin ilk kod hücresi yazdırır.
-- **Çıktılar:** Bütün şekiller ve tablolar `outputs/` klasörüne yazılır.
+- **Çıktılar:** Sonuç tabloları (CSV/JSON) `outputs/` klasöründedir. Defter çalıştırılınca şekiller (PNG) de aynı klasöre yazılır; şekiller ayrıca defterin içinde görünür.
 
 ## Klasör yapısı
 
 ```
 YZM411_Odev1.ipynb   # tüm deneyler: tahmin → kod → ölçüm → yorum
 data/                # 3 özgün fotoğraf (normal, gölge, lamba)
-outputs/             # defterin ürettiği CSV/JSON tablolar ve PNG şekiller
-rapor/               # 2 sayfalık PDF rapor ve HTML kaynağı
+outputs/             # defterin ürettiği sonuç tabloları (CSV/JSON); PNG şekiller çalıştırınca oluşur
+rapor/               # 2 sayfalık PDF rapor
 requirements.txt
 KAYNAK_BEYANI.md
 ```
