@@ -1,0 +1,5 @@
+﻿dönüşüm,tahmin,karşılaştırma değeri,ölçülen ortalama,fark,tahmin tuttu mu
+özgün (μ),—,96.85,96.85,0.0,—
+b = +40,μ + 40'a yakın ama biraz altında,136.85,135.69,-1.16,evet
+γ = 0.5,"artar; 255·(μ/255)^0,5'ten düşük",157.15,148.55,-8.6,evet
+γ = 2.0,azalır; 255·(μ/255)^2'den yüksek,36.78,52.27,15.49,evet

@@ -1,0 +1,9 @@
+﻿kaydırma (px),yöntem,koyu çubuk sayısı (tarama satırı),kaydırmasız sonuçtan fark (MAE)
+0,NEAREST,6,0.0
+0,AREA,3,0.0
+1,NEAREST,3,39.6
+1,AREA,5,11.7
+2,NEAREST,6,40.8
+2,AREA,5,16.2
+3,NEAREST,7,43.5
+3,AREA,4,20.0

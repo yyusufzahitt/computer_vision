@@ -1,0 +1,4 @@
+﻿koşul,img.shape,H × W × C,dtype,dtype aralığı,ölçülen min,ölçülen max,kanal sırası (cv2)
+normal,"(1530, 2040, 3)",1530 × 2040 × 3,uint8,0–255,0,255,"B, G, R"
+golge,"(1530, 2040, 3)",1530 × 2040 × 3,uint8,0–255,0,227,"B, G, R"
+lamba,"(2040, 1530, 3)",2040 × 1530 × 3,uint8,0–255,0,255,"B, G, R"

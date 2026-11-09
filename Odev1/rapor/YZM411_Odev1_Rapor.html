@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>YZM411 Ödev 1 Raporu</title>
+<style>
+  @page { size: A4; margin: 8mm 10mm 8mm 10mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Calibri, Arial, sans-serif; font-size: 7.9pt; line-height: 1.25; color: #111; margin: 0; }
+  h1 { font-size: 11.5pt; margin: 0 0 0.6mm; }
+  .meta { font-size: 7.6pt; color: #333; margin-bottom: 1.5mm; border-bottom: 0.4pt solid #999; padding-bottom: 1mm; }
+  h2 { font-size: 8.6pt; margin: 1.6mm 0 0.6mm; color: #0b3d6e; break-after: avoid; }
+  p { margin: 0 0 1mm; text-align: justify; hyphens: auto; }
+  .cols { column-count: 2; column-gap: 5mm; }
+  .cols > h2:first-child { margin-top: 0; }
+  figure { margin: 1mm 0 1.2mm; break-inside: avoid; }
+  figure img { width: 100%; display: block; }
+  figure.dar img { width: 92%; margin: 0 auto; }
+  figcaption { font-size: 7pt; color: #333; margin-top: 0.6mm; text-align: justify; }
+  table { border-collapse: collapse; width: 100%; font-size: 7pt; margin: 0.6mm 0 0.4mm; }
+  th, td { border: 0.4pt solid #888; padding: 0.35mm 1mm; text-align: center; }
+  th { background: #e9eef5; }
+  td:first-child, th:first-child { text-align: left; }
+  .not { font-size: 6.9pt; color: #333; margin: 0 0 1mm; }
+  .box { border: 0.6pt solid #0b3d6e; background: #f3f6fb; padding: 1.2mm 2.2mm; margin: 1.4mm 0; }
+  .box p { margin-bottom: 0.8mm; }
+  .ok { color: #176c2f; font-weight: 600; }
+  .no { color: #b3261e; font-weight: 600; }
+  .sayfa2 { break-before: page; }
+  code { font-family: Consolas, monospace; font-size: 7.3pt; }
+</style>
+</head>
+<body>
+
+<h1>YZM 411 Bilgisayarlı Görü — Ödev 1: Renk, Aydınlatma ve Örnekleme</h1>
+<div class="meta">Yusuf Zahit Altın · 230212031 · 10 Kasım 2026 · Kod: <code>YZM411_Odev1.ipynb</code> (Kernel → Restart &amp; Run All) ·
+Ham sonuçlar: <code>outputs/*.csv</code> · Sonuç tablosu: <code>outputs/07_sonuc_tablosu.csv</code></div>
+
+<h2>1. Veri, deney düzeni ve sınırlar</h2>
+<p>Sahne: ahşap sehpa üzerinde ters duran sarı seramik kupa, beyaz kâğıt ve kitap arka kapağı (küçük puntolu yazı + ISBN barkodu).
+Üç fotoğraf çektim: normal ışık, gölge (normal ışıkta kendi gövdemin gölgesi) ve sarı ışıklı lamba. Telefon Samsung Galaxy A54,
+Pro moddaydı; ancak <b>beyaz dengesi Auto'daydı</b>. Fotoğraflar WhatsApp ile aktarıldığı için EXIF silindi (0 etiket) ve görüntüler
+2040×1530'a küçültüldü. Bu yüzden farkların <b>yalnızca ışıktan</b> geldiğini iddia etmiyorum. <b>Kamerayı sabitleyemedim</b>; üç çekim
+farklı açıdan yapıldı. Bunu kısmen telafi etmek için masa düzlemi üzerinden homografi kestirdim (SIFT + RANSAC, ardından ECC ince ayarı;
+korelasyon gölge 0,893, lamba 0,926). Renkleri her zaman <b>özgün</b> fotoğraftan okudum; homografiyi yalnızca aynı fiziksel noktayı bulmak
+ve maskeleri aynı alanda karşılaştırmak için kullandım. Kitap (~1,5 cm) ve kupanın üstü (~8 cm) düzlem dışında olduğundan hafif kayma
+kalıyor; kupa noktasını bu yüzden her fotoğrafta tabanındaki halkaya elips uydurarak buldum. Bütün tahminler deney kodu çalıştırılmadan
+önce defterde yazılıydı.</p>
+
+<figure>
+  <img src="../outputs/08_rapor_sekil1.png" alt="Üç özgün fotoğraf ve altı maske">
+  <figcaption><b>Şekil 1.</b> Üç özgün fotoğraf ve aynı (dondurulmuş) eşiklerle elde edilen 6 maske. Yüzde = seçilen piksel / görüntü
+  alanı (3.121.200 px). Lamba fotoğrafı dikey çekildi; yalnızca sayfa yerleşimi için 90° döndürülerek gösterildi.</figcaption>
+</figure>
+
+<table>
+  <tr><th>Tablo 1 — karşılaştırma</th><th>normal</th><th>gölge</th><th>lamba</th></tr>
+  <tr><td>kupa: (x, y) → (R, G, B), tek piksel</td><td>(1542, 707) → (250, 246, 61)</td><td>(1358, 672) → (198, 163, 95)</td><td>(770, 1541) → (200, 170, 100)</td></tr>
+  <tr><td>kâğıt: (x, y) → (R, G, B)</td><td>(748, 797) → (212, 223, 243)</td><td>(648, 812) → (183, 166, 159)</td><td>(697, 806) → (206, 197, 202)</td></tr>
+  <tr><td>ahşap: (x, y) → (R, G, B)</td><td>(1100, 420) → (187, 134, 64)</td><td>(968, 467) → (178, 114, 78)</td><td>(1065, 1132) → (176, 111, 81)</td></tr>
+  <tr><td>kupa (H, S, V), 11×11 ortalama</td><td>(29, 193, 250)</td><td>(20, 133, 198)</td><td>(21, 128, 199)</td></tr>
+  <tr><td>beyaz kâğıt R/G, B/G (11×11)</td><td>0,95 / 1,09</td><td>1,10 / 0,96</td><td>1,05 / 1,03</td></tr>
+  <tr><td>RGB maskesi: görüntü alanına oran</td><td>%1,277</td><td>%0,000</td><td>%0,000</td></tr>
+  <tr><td>HSV maskesi: görüntü alanına oran</td><td>%1,644</td><td>%0,000</td><td>%0,000</td></tr>
+  <tr><td>geniş HSV eşiği (ek analiz) / seçilenlerin kupa kutusundaki payı</td><td>%19,22 / %24,4</td><td>%1,91 / %98,9</td><td>%1,90 / %100</td></tr>
+  <tr><td>kâğıda göre renk düzeltmesi sonrası kupa (H, S, V)</td><td>(29, 193, 250)</td><td>(26, 94, 233)</td><td>(25, 107, 205)</td></tr>
+</table>
+<p class="not">Eşikler yalnızca normal fotoğrafta, kupa tabanından alınan 60×60 bölgeyle belirlenip donduruldu: RGB R 207–255, G 205–255, B 18–109;
+HSV H 24–35, S 144–255, V 167–255 (OpenCV 8 bit: H 0–179, S/V 0–255). <b>Maske alan oranı bir doğruluk ölçütü değildir.</b></p>
+
+<div class="cols">
+<h2>2. Deney 1 — H1: Görüntünün sayısal yapısı</h2>
+<p><b>Tahmin:</b> Fotoğraflar 3 kanallı, <code>uint8</code>, 0–255 olacak. Gölgede R, G, B aynı oranda düşecek. Sarı lambada kâğıt sarımsı
+(R &gt; G &gt; B) ölçülecek. BGR dönüştürülmeden gösterilirse sarı kupa camgöbeği görünecek.</p>
+<p><b>Ölçüm:</b> <code>img.shape</code> = (1530, 2040, 3), lambada (2040, 1530, 3); <code>uint8</code>; 0–255 (gölgede en büyük değer 227).
+<code>img[707, 1542]</code> = [61 246 250] (B, G, R); <code>cv2.cvtColor</code> sonrası [250 246 61]; <code>img[x, y]</code> IndexError verdi.
+Üç noktanın değerleri Tablo 1'de. Gölgede kupa R ×0,79, G ×0,66, <b>B ×1,55</b> değişti; lambada kâğıt (206, 197, 202) ölçüldü.
+<b>Sonuç:</b> yapı <span class="ok">✔</span>, camgöbeği <span class="ok">✔</span>; gölgede aynı oran <span class="no">✘</span>, lambada sarımsı kâğıt <span class="no">✘</span>.</p>
+<p><b>Ne gördüm?</b> Gölge yalnızca parlaklığı değil rengi de değiştirdi: parlak kupada B arttı, mat kâğıtta azaldı. Sarı lambada beyaz kâğıt
+nötre yakın kaldı. <b>Neden olabilir?</b> (1) Beyaz dengesi Auto olduğu için kamera sıcak ışığı mavi kazancını artırarak "düzeltti";
+kâğıt nötr çıktı, kupada B yükseldi. (2) Gölgedeki ışık duvar ve koltuktan yansıyan dolaylı ışıktır, rengi farklıdır. (3) Sırlı kupa ve
+vernikli ahşap ortamı yansıtıp renge beyazımsı bir katkı ekler. <b>Nasıl kontrol ederim?</b> Beyaz dengesini 5500 K değerine kilitleyip tekrar
+çekmek, EXIF'i koruyan aktarım yapmak, aynı ölçümü mat sarı bir nesneyle tekrarlamak.</p>
+
+<h2>3. Deney 2 — H2: Sabit RGB ve HSV eşikleri</h2>
+<p><b>Tahmin:</b> Gölgede RGB maskesi çok küçülecek, HSV daha az küçülecek; sarı lambada ahşap ve kâğıt da eşiği geçecek.</p>
+<p><b>Ölçüm:</b> RGB %1,277 → gölge %0, lamba %0; HSV %1,644 → %0 ve %0 (Şekil 1). Normal fotoğrafta seçilen piksellerin tamamı
+kupadaydı. Kupanın tonu 29 → 20/21, doygunluğu 193 → 133/128 oldu: H ve S eşiğin dışına düştü, V içinde kaldı.
+<b>Sonuç:</b> RGB küçülür <span class="ok">✔</span>; HSV daha az küçülür <span class="no">✘</span>; lambada arka plan seçilir <span class="no">✘</span>.</p>
+<p><b>Ne gördüm?</b> İki renk uzayı da gölgede ve lambada kupayı tamamen kaçırdı. <b>Neden olabilir?</b> HSV parlaklığı tondan ancak ışık
+değişimi üç kanalı <i>aynı oranda</i> ölçeklerse ayırır; Deney 1'de değişimin rengin kendisinde olduğunu ölçtüm. Ayrıca eşik küçük ve
+parlak bir bölgeden alındığı için dardı (bölgede H yalnızca 29–30). <b>Nasıl kontrol ederim?</b> Her fotoğrafı beyaz kâğıda göre renk
+düzelttim (von Kries) ve aynı eşiği uyguladım: ton geri geldi (H 26 ve 25, eşik içinde), doygunluk gelmedi (S 94 ve 107 &lt; 144) ve maske
+yine boş kaldı (Tablo 1, son satır). Ton kaymasını ışığın rengi ve otomatik beyaz dengesi, solmayı ise parlak yüzey yansıması ve telefonun
+görüntü işlemesi açıklıyor. Mat bir nesne ve sabit beyaz dengesiyle tekrar etmek bunu doğrular.</p>
+</div>
+
+<div class="sayfa2"></div>
+<figure class="dar">
+  <img src="../outputs/08_rapor_sekil2.png" alt="Geniş eşik, barkod ve yazı küçültme">
+  <figcaption><b>Şekil 2.</b> (a) Kupayı üç ışıkta da yakalayan geniş HSV eşiği normal fotoğrafta masayı ve yastığı da seçiyor.
+  (b–g) 1/4 küçültme (<code>cv2.INTER_NEAREST</code> ve <code>cv2.INTER_AREA</code>); yalnızca gösterim için en yakın komşuyla özgün boyuta
+  büyütüldü, aynı kesit yan yana. (h) Yazının yalnızca NEAREST'in örneklediği 1/16 pikseli bırakılıp gerisi griye boyanmış hâli; bu görüntünün
+  NEAREST küçültmesi, (e)'deki özgününkiyle piksel piksel aynı.</figcaption>
+</figure>
+
+<div class="cols">
+<h2>4. Deney 3 — H3: Parlaklık ve gama (normal fotoğraf, float64, μ = 96,85)</h2>
+<p><b>Tahmin:</b> b = +40 sonrası ortalama μ + 40'a yakın ama biraz altında olacak (215'in üstü kırpılır). γ = 0,5 ortalamayı belirgin
+artıracak (en çok karanlık tonlar), γ = 2,0 düşürecek (karanlıklar siyaha yaklaşır). Jensen eşitsizliğine göre γ = 0,5'te ölçülen
+&lt; 255·(μ/255)<sup>0,5</sup>, γ = 2,0'da ölçülen &gt; 255·(μ/255)<sup>2</sup> olacak.</p>
+<p><b>Ölçüm:</b> b = +40 → <b>135,69</b> (beklenen 136,85; −1,16). Kanal değerlerinin %6,77'si, piksellerin %11,45'i 255'te kırpıldı
+(kâğıt, kupa, aydınlık ahşap, kitaptaki beyaz harfler); kırpmanın ortalamadan götürdüğü 1,156, eksikliğe eşit. γ = 0,5 → <b>148,55</b>
+(&lt; 157,15); artış I &lt; 128'de +59,4, I ≥ 192'de +16,0. γ = 2,0 → <b>52,27</b> (&gt; 36,78); 20'nin altındaki değerler %3,8 → %45,2.
+Formül kontrolü: 64 → 127,75 ve 16,06. <b>Sonuç:</b> üç tahmin de <span class="ok">✔</span>.</p>
+<p><b>Ne gördüm?</b> Ortalama 40 değil 38,84 arttı; eksik kısmın tamamı kırpmadan geldi. Gama karanlık tonları açtı ya da gömdü, parlak
+tonları az değiştirdi. <b>Neden olabilir?</b> Kırpma, 215–255 arasındaki 41 seviyeyi tek değere (255) eşler; beyaz harfle kâğıdın ince
+tonları ayırt edilemez olur. Gama kırpmaz ama 8 bite yuvarlanınca 256 seviyeden 192'si kalır (γ = 2,0'da 0–11 → 0). <code>uint8</code>
+üzerinde toplasaydım değerler taşardı (kâğıt B 243 → 27, ortalama 119,50); bu yüzden float kullandım. <b>Nasıl kontrol ederim?</b>
+Kırpılan değerleri sayıp kaybı hesapladım; ortalamadaki eksiklikle eşit çıktı.</p>
+
+<h2>5. Deney 4 — H4: Küçültme (yazı 260×200 → 65×50, barkod 80×76 → 20×19)</h2>
+<p><b>Tahmin:</b> Harfler 8–10 px; 1/4'te 2–3 px'e inip iki yöntemde de okunamayacak. NEAREST çizgileri koparıp barkodda sahte desen
+üretecek; AREA griye çevirecek ama sahte desen üretmeyecek; büyütme yazıyı geri getirmeyecek.</p>
+<p><b>Ölçüm:</b> satır aralığı 12 px ve küçük harf ≈ 5 px (ölçülen), büyük harf ≈ 8 px (kestirilen) → 1/4'te ≈ 1,2 ve 2 px.
+Kontrast (p95−p5) yazıda 163 → NEAREST 164, AREA 95. Barkodun y = 960 satırında koyu çubuk sayısı 17 → NEAREST 6, AREA 3. Bölgeyi
+1–3 px kaydırınca küçük görüntü NEAREST'te ortalama 41,3, AREA'da 16,0 gri düzey değişti. <b>Sonuç:</b> dört tahmin de
+<span class="ok">✔</span> (AREA için büyük ölçüde: barkodda kalıntı gri şeritler var).</p>
+<p><b>Ne gördüm?</b> NEAREST kontrastı korudu ama harfleri kopuk noktalara, barkodu yanlış yerde ve rastgele kalınlıkta bloklara çevirdi.
+AREA satırların yerini bıraktı, harfleri gri şeritlere dönüştürdü (Şekil 2b–g). <b>Neden olabilir?</b> Barkodun çubuk ve boşlukları
+çoğunlukla 1–3 px; 1/4'te yeni piksel aralığı 4 px olduğundan desen Nyquist sınırının altında kalıyor. NEAREST önce süzgeç uygulamadan
+16 pikselden yalnızca birini aldığı için ince desen sahte bir kalın desene katlanıyor (aliasing); hangi pikselin alındığı örnekleme
+fazına bağlı olduğundan kaydırınca desen de değişiyor. AREA 4×4 ortalaması aldığı için ayrıntı griye karışıyor. <b>Nasıl kontrol
+ederim?</b> Faz testini yaptım. Ayrıca NEAREST öncesi Gauss bulanıklaştırma sahte deseni yok etmeli; okunabilirlik OCR ile ölçülebilir.</p>
+</div>
+
+<div class="box">
+<p><b>Sarı bir arka plan neden hedef gibi seçildi?</b> Dondurulmuş eşiklerle hiçbir arka plan seçilmedi; gölge ve lambada maskeler boştu.
+Kupayı üç ışıkta da yakalayacak <i>tek</i> bir geniş eşik kurduğumda (aynı kural, üç fotoğrafın kupa bölgelerinden: H 15–35, S ≥ 84,
+V ≥ 115), normal fotoğrafta HSV maskesi %1,64'ten <b>%19,22</b>'ye çıktı ve seçilenlerin yalnızca %24,4'ü kupa kutusundaydı: ahşap masa
+ve hardal yastık hedef gibi seçildi (Şekil 2a). Nedeni şu: ışık değişince kupanın tonu 29'dan 20'ye kaydı ve ahşabın tonuna (17)
+yaklaştı. Renk uzayında hedefle arka plan arasındaki mesafe kapanınca, hedefi kaçırmayacak kadar geniş bir eşik sarımsı arka planı da içine
+alır; dar bir eşik ise hedefi kaçırır (%0). Bu bir ödünleşimdir.</p>
+<p><b>Büyütme kaybolan yazıyı neden geri getirmedi?</b> 1/4 küçültme her 4×4 bloğu tek sayıya indirir: NEAREST 16 pikselden 15'ini atar,
+AREA yalnızca ortalamayı saklar. Yazılı özgünün NEAREST küçültmesi ile yalnızca örneklenen 1/16 pikseli bırakıp gerisini griye
+boyadığım görüntününki (Şekil 2h), AREA küçültmesi ile de her bloğu kendi ortalamasıyla doldurduğum yazısız görüntününki piksel piksel aynı
+çıktı (en büyük fark 0). Küçük görüntü hangi özgünden geldiği bilgisini taşımadığı için büyütme (NEAREST de INTER_CUBIC de) yalnızca tahmin
+üretir; atılan bilgi geri gelmez.</p>
+</div>
+
+<div class="cols">
+<h2>6. Tutmayan tahminler ve sınırlar</h2>
+<p>Defterdeki sonuç tablosuna göre 15 tahmin ve beklentiden 10'u tuttu, 5'i tutmadı. En öğreticisi: <b>"Gölgede HSV maskesi RGB'den daha
+az küçülür"</b> tahminim tutmadı; HSV de %0'a düştü, çünkü ışık değişimi saf bir parlaklık değişimi değildi. Ayrıca kâğıda göre renk
+düzeltmesinin maskeyi geri getireceği beklentim de tutmadı. <b>Sınırlar:</b> kamera sabit değildi (homografi yalnızca masa düzleminde
+doğru); beyaz dengesi Auto ve EXIF yok; WhatsApp sıkıştırması; tek sahne ve tek nesne; okunabilirliği gözle değerlendirdim.</p>
+
+<h2>7. Yapay zekâ ve kaynak beyanı</h2>
+<p><b>Araç:</b> Claude Code (Anthropic, Claude Opus 5.5 modeli). <b>Kullanım amacı:</b> adım planı ve çekim talimatı; defterdeki kodun
+tamamı (hizalama, dört deney, kontroller, sonuç tabloları, rapor şekilleri); dört deneyin tahmin taslakları (okudum, değiştirmeden onayladım;
+deney kodundan önce deftere kondu); yorum hücreleri ve bu raporun taslağı. <b>Etkilediği dosya/hücre:</b> <code>YZM411_Odev1.ipynb</code>
+(tüm hücreler), <code>outputs/</code>, <code>rapor/</code>, <code>requirements.txt</code>. <b>Kendi yaptıklarım:</b> sahneyi kurup üç
+fotoğrafı çektim, çekim koşullarını bildirdim, tahminleri onayladım, sonuçları ve raporu okuyup kontrol ettim. <b>Nasıl doğruladım:</b>
+defter nbconvert ile baştan sona birçok kez çalıştırıldı ve aynı sonuçları verdi; formüller ödevdeki örnekle (64 → 127,75 / 16,06)
+doğrulandı; nokta konumları ve hizalama görsel olarak kontrol edildi; rapordaki sayılar defter çıktılarından (<code>outputs/*.csv</code>)
+alındı. <b>Kaynaklar:</b> YZM411 ders notları (Hafta 1–2); OpenCV ve NumPy resmî belgeleri. Fotoğraflar kendi çekimimdir.</p>
+</div>
+
+</body>
+</html>

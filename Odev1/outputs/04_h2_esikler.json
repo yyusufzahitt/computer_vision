@@ -1,0 +1,29 @@
+{
+  "ESIK_ROI": [
+    1512,
+    677,
+    1572,
+    737
+  ],
+  "RGB_ALT": [
+    207,
+    205,
+    18
+  ],
+  "RGB_UST": [
+    255,
+    255,
+    109
+  ],
+  "HSV_ALT": [
+    24,
+    144,
+    167
+  ],
+  "HSV_UST": [
+    35,
+    255,
+    255
+  ],
+  "not": "Yalnızca normal fotoğraftan; dondurulmuştur."
+}

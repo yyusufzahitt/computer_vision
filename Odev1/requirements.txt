@@ -1,0 +1,8 @@
+# YZM411 Ödev 1 — çalıştırma ortamı (Python 3.11.9 üzerinde test edildi)
+numpy==1.26.4
+opencv-python==4.13.0.92
+matplotlib==3.8.2
+pandas==3.0.1
+Pillow==13.0.0
+jupyter==1.1.1
+ipykernel==7.2.0

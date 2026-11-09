@@ -1,0 +1,10 @@
+﻿nokta,koşul,"R,G,B (11×11)","H,S,V (11×11)",RGB eşiğinde mi,HSV eşiğinde mi
+kupa,normal,"(250, 246, 61)","(29, 193, 250)",evet,evet
+kupa,golge,"(198, 163, 95)","(20, 133, 198)",hayır,hayır
+kupa,lamba,"(199, 169, 99)","(21, 128, 199)",hayır,hayır
+kağıt,normal,"(212, 223, 243)","(109, 33, 243)",hayır,hayır
+kağıt,golge,"(181, 164, 157)","(9, 34, 181)",hayır,hayır
+kağıt,lamba,"(205, 196, 201)","(163, 11, 205)",hayır,hayır
+ahşap,normal,"(183, 130, 61)","(17, 171, 183)",hayır,hayır
+ahşap,golge,"(179, 115, 79)","(11, 142, 179)",hayır,hayır
+ahşap,lamba,"(176, 111, 81)","(9, 137, 176)",hayır,hayır
